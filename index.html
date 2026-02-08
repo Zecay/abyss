@@ -1,375 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --sea-cyan: #00ffff;
-            --bg-dark: #010409;
-            --biolume: rgba(0, 255, 255, 0.4);
-            --text-gray: #94a3b8;
-        }
+<meta charset="UTF-8">
+<title>Abyss Wiki</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== VARIABLES ===================== */
+:root {
+    --sea-cyan: #00ffff;
+    --bg-dark: #010409;
+    --text-gray: #94a3b8;
+    --biolume: rgba(0, 255, 255, 0.4);
+}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ===================== GLOBAL ===================== */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: white;
+}
+a { text-decoration: none; color: var(--sea-cyan); }
+h1,h2,h3,h4,h5,h6 { font-family: 'Orbitron', sans-serif; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            width: 100%;
-        }
+/* ===================== HEADER ===================== */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.9);
+    padding: 15px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0,255,255,0.1);
+}
 
-        #canvas-particles {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            background: linear-gradient(to bottom, #001a33 0%, #000 100%);
-        }
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    color: var(--sea-cyan);
+}
 
-        /* Depth Meter */
-        #depth-container {
-            position: fixed;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 100;
-            text-align: right;
-            font-family: 'Orbitron';
-            pointer-events: none;
-        }
+.menu a {
+    margin-left: 25px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--sea-cyan);
+    transition: 0.3s;
+}
 
-        #depth-value {
-            font-size: 1.2rem;
-            color: var(--sea-cyan);
-            text-shadow: 0 0 10px var(--sea-cyan);
-        }
+.menu a:hover {
+    color: #ffffff;
+}
 
-        .depth-bar {
-            width: 2px;
-            height: 150px;
-            background: linear-gradient(transparent, var(--sea-cyan), transparent);
-            margin: 10px 0 0 auto;
-            position: relative;
-        }
+/* ===================== MAIN CONTENT ===================== */
+main {
+    padding: 120px 40px 60px; /* leave space for header */
+    max-width: 1200px;
+    margin: auto;
+}
 
-        .depth-pointer {
-            position: absolute;
-            right: -4px;
-            width: 10px; height: 10px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 0 10px white;
-            transition: 0.1s;
-        }
+/* ===================== GRID CARDS ===================== */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+.card {
+    background: rgba(0,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    transition: 0.3s;
+}
+.card:hover { border-color: var(--sea-cyan); }
+.card h3 { margin-bottom: 12px; color: var(--sea-cyan); }
+.card p { color: var(--text-gray); line-height: 1.6; }
 
-        /* Sections */
-        .section {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 80px 20px;
-            position: relative;
-        }
+/* ===================== TAGS ===================== */
+.tag {
+    display: inline-block;
+    background: rgba(0,255,255,0.1);
+    color: var(--sea-cyan);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-bottom: 8px;
+}
 
-        .live-status {
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid var(--sea-cyan);
-            padding: 10px 25px;
-            border-radius: 50px;
-            font-family: 'Orbitron';
-            font-size: 0.75rem;
-            color: var(--sea-cyan);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-
-        .pulse-dot {
-            width: 8px; height: 8px;
-            background: var(--sea-cyan);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.4); opacity: 0.5; }
-        }
-
-        .title {
-            font-family: 'Orbitron';
-            font-size: clamp(3rem, 12vw, 7rem);
-            font-weight: 900;
-            letter-spacing: 15px;
-            text-shadow: 0 0 40px var(--biolume);
-        }
-
-        .countdown-container {
-            display: flex;
-            gap: 15px;
-            margin: 40px 0;
-        }
-
-        .card {
-            background: rgba(0, 255, 255, 0.03);
-            border: 1px solid var(--sea-cyan);
-            padding: 20px;
-            border-radius: 8px;
-            min-width: 90px;
-            backdrop-filter: blur(5px);
-        }
-
-        .num { font-family: 'Orbitron'; font-size: 2.2rem; color: var(--sea-cyan); display: block; text-align: center;}
-        .lab { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-gray); display: block; text-align: center;}
-
-        .btn-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-
-        .btn {
-            text-decoration: none;
-            padding: 18px 35px;
-            font-family: 'Orbitron';
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-radius: 4px;
-            transition: 0.3s;
-            font-weight: bold;
-        }
-
-        .btn-fill { background: var(--sea-cyan); color: #000; }
-        .btn-line { border: 1px solid var(--sea-cyan); color: var(--sea-cyan); }
-
-        /* Gameplay Info */
-        .content-box {
-            max-width: 900px;
-            text-align: center;
-        }
-
-        .content-box h2 {
-            font-family: 'Orbitron';
-            color: var(--sea-cyan);
-            font-size: 2.2rem;
-            margin-bottom: 25px;
-        }
-
-        .content-box p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--text-gray);
-            margin-bottom: 40px;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            width: 100%;
-            margin-top: 40px;
-        }
-
-        .feature-item {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            text-align: left;
-            transition: 0.3s;
-        }
-
-        .feature-item:hover { border-color: var(--sea-cyan); }
-
-        .feature-item h4 { 
-            font-family: 'Orbitron'; 
-            color: var(--sea-cyan); 
-            margin-bottom: 12px; 
-            text-transform: uppercase;
-        }
-
-        .feature-item p { font-size: 0.9rem; line-height: 1.6; margin: 0; }
-
-        .tag {
-            display: inline-block;
-            background: rgba(0, 255, 255, 0.1);
-            color: var(--sea-cyan);
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-family: 'Orbitron';
-            margin-bottom: 15px;
-        }
-
-        @media (max-width: 600px) {
-            .title { letter-spacing: 5px; font-size: 2.5rem; }
-            .card { min-width: 70px; padding: 10px; }
-            .num { font-size: 1.5rem; }
-        }
-    </style>
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 600px) {
+    header { flex-direction: column; align-items: flex-start; }
+    .menu { margin-top: 10px; }
+}
+</style>
 </head>
 <body>
 
-    <canvas id="canvas-particles"></canvas>
+<header>
+    <h1>ABYSS</h1>
+    <nav class="menu">
+        <a href="#" onclick="showHome()">Home</a>
+        <a href="#" onclick="showSection('intro')">Wiki</a>
+        <a href="https://discord.gg/deepspirit" target="_blank">Discord</a>
+        <a href="https://www.roblox.com/communities/34898222" target="_blank">Roblox Group</a>
+    </nav>
+</header>
 
-    <div id="depth-container">
-        <div id="depth-value">0m</div>
-        <div class="depth-bar">
-            <div class="depth-pointer" id="pointer"></div>
-        </div>
-    </div>
-
-    <section class="section">
-        <div class="live-status">
-            <div class="pulse-dot"></div>
-            <span>DIVERS ONLINE: <span id="p-count">0</span></span>
-        </div>
-        <h1 class="title">ABYSS</h1>
-        <p style="color: var(--sea-cyan); letter-spacing: 8px; font-size: 0.8rem; margin-top: 10px;">FEBRUARY 8, 2026</p>
-        
-        <div id="timer" class="countdown-container">
-            <div class="card"><span class="num" id="d">00</span><span class="lab">Days</span></div>
-            <div class="card"><span class="num" id="h">00</span><span class="lab">Hours</span></div>
-            <div class="card"><span class="num" id="m">00</span><span class="lab">Mins</span></div>
-            <div class="card"><span class="num" id="s">00</span><span class="lab">Secs</span></div>
-        </div>
-
-        <div class="btn-row">
-            <a href="https://discord.gg/deepspirit" target="_blank" class="btn btn-fill">Join Beta Discord</a>
-            <a href="https://www.roblox.com/communities/34898222" target="_blank" class="btn btn-line">Roblox Group</a>
-        </div>
-    </section>
-
-    <section class="section" style="background: rgba(0,0,0,0.4);">
-        <div class="content-box">
-            <div class="tag">DEEP SEA RPG</div>
-            <h2>NOT JUST FISHING. ADVENTURE.</h2>
-            <p>Abyss is an upcoming underwater RPG experience on Roblox. Unlike traditional fishing games, Abyss puts you in the heart of the hunt. Explore massive environments, manage your survival, and discover what hides in the dark.</p>
-            
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <h4>🏹 Active Hunting</h4>
-                    <p>Forget the rod. Use harpoons and underwater guns to hunt 500+ unique species. Aim, fire, and win the minigame to secure your catch.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>🧬 The Race System</h4>
-                    <p>Every diver is unique. Choose your Race to unlock specific traits and abilities that change how you survive and hunt in the deep.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>☣️ Survival Mechanics</h4>
-                    <p>The ocean is hostile. Manage your oxygen levels and upgrade your gear to withstand the crushing pressure of the Abyss.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>💎 Fair Play</h4>
-                    <p>Abyss is Free to Play. While optional game passes exist, the experience is designed to be Skill-to-Win, not Pay-to-Win.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<main id="content">
+    <!-- HOME content will be loaded by JS -->
+</main>
 
 <script>
-    // --- PARTICLES ---
-    const canvas = document.getElementById('canvas-particles');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+// ===================== NAVIGATION =====================
+function showHome() {
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <section id="home">
+            <h2>Welcome to Abyss</h2>
+            <p>Explore the deep, hunt creatures, survive, and discover the secrets of the Abyss.</p>
+            <p>Use the navigation menu to explore the Wiki, join Discord, or visit the Roblox group.</p>
+        </section>
+    `;
+}
 
-    function initParticles() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        particles = [];
-        for (let i = 0; i < 80; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2,
-                speed: Math.random() * 0.4 + 0.1
-            });
-        }
+function showSection(sectionId) {
+    const content = document.getElementById('content');
+    if(sectionId === 'intro') {
+        content.innerHTML = `
+            <section id="intro">
+                <h2>Abyss Wiki</h2>
+                <p>Explore races, creatures, gear, and zones below. Click on any section to learn more.</p>
+
+                <div id="wiki-sections">
+                    <h3 onclick="showWikiSection('classes')">Classes</h3>
+                    <h3 onclick="showWikiSection('creatures')">Creatures</h3>
+                    <h3 onclick="showWikiSection('gear')">Gear</h3>
+                    <h3 onclick="showWikiSection('zones')">Zones</h3>
+                </div>
+
+                <div id="wiki-content" style="margin-top:30px;"></div>
+            </section>
+        `;
     }
+}
 
-    function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(0, 255, 255, 0.3)";
-        particles.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-            p.y -= p.speed;
-            if (p.y < 0) p.y = canvas.height;
-        });
-        requestAnimationFrame(animateParticles);
+function showWikiSection(section) {
+    const container = document.getElementById('wiki-content');
+    if(section === 'classes') {
+        container.innerHTML = `<h4>Playable Classes</h4>
+            <div class="grid" id="class-grid"></div>`;
+        populateClasses();
+    } else if(section === 'creatures') {
+        container.innerHTML = `<h4>Creatures & Fish</h4>
+            <div class="grid" id="creature-grid"></div>`;
+        populateCreatures();
+    } else if(section === 'gear') {
+        container.innerHTML = `<h4>Gear & Items</h4>
+            <div class="grid" id="gear-grid"></div>`;
+        populateGear();
+    } else if(section === 'zones') {
+        container.innerHTML = `<h4>Zones & Maps</h4>
+            <div class="grid" id="zone-grid"></div>`;
+        populateZones();
     }
+}
 
-    window.addEventListener('resize', initParticles);
-    initParticles();
-    animateParticles();
+// ===================== SAMPLE DATA =====================
+const classes = [
+    { name: "Deep Diver", tag: "Survivalist", description: "Specializes in deep diving and oxygen management." },
+    { name: "Abyssal Child", tag: "Explorer", description: "Fast swimmer, excels in exploration and stealth." }
+];
 
-    // --- DEPTH METER ---
-    window.addEventListener('scroll', () => {
-        const depth = Math.floor(window.scrollY * 2.5);
-        document.getElementById('depth-value').innerText = `${depth}m`;
-        const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-        document.getElementById('pointer').style.top = `${scrollPercent}%`;
+const creatures = [
+    { name: "Glowfish", tag: "Common", description: "A bioluminescent fish found in shallow areas." },
+    { name: "Abyssal Shark", tag: "Rare", description: "Dangerous predator lurking in deep zones." }
+];
+
+const gear = [
+    { name: "Oxygen Tank", tag: "Essential", description: "Increases your underwater breathing time." },
+    { name: "Harpoon Gun", tag: "Weapon", description: "Used to hunt underwater creatures." }
+];
+
+const zones = [
+    { name: "Shallow Reef", tag: "Beginner", description: "Safe area for new divers." },
+    { name: "Mid Abyss", tag: "Intermediate", description: "Dangerous creatures appear here." }
+];
+
+// ===================== POPULATE FUNCTIONS =====================
+function populateClasses() {
+    const container = document.getElementById('class-grid');
+    container.innerHTML = '';
+    classes.forEach(cls => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `<div class="tag">${cls.tag}</div>
+                          <h3>${cls.name}</h3>
+                          <p>${cls.description}</p>`;
+        container.appendChild(card);
     });
+}
 
-    // --- COUNTDOWN ---
-    const releaseTarget = new Date('2026-02-08T18:00:00Z').getTime(); // UTC
-    function updateCountdown() {
-        const now = Date.now();
-        const diff = releaseTarget - now;
+function populateCreatures() {
+    const container = document.getElementById('creature-grid');
+    container.innerHTML = '';
+    creatures.forEach(c => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `<div class="tag">${c.tag}</div>
+                          <h3>${c.name}</h3>
+                          <p>${c.description}</p>`;
+        container.appendChild(card);
+    });
+}
 
-        if (diff <= 0) {
-            document.getElementById('timer').innerHTML =
-                "<h2 style='color:var(--sea-cyan); font-family:Orbitron;'>THE ABYSS HAS OPENED</h2>";
-            return;
-        }
+function populateGear() {
+    const container = document.getElementById('gear-grid');
+    container.innerHTML = '';
+    gear.forEach(g => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `<div class="tag">${g.tag}</div>
+                          <h3>${g.name}</h3>
+                          <p>${g.description}</p>`;
+        container.appendChild(card);
+    });
+}
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+function populateZones() {
+    const container = document.getElementById('zone-grid');
+    container.innerHTML = '';
+    zones.forEach(z => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `<div class="tag">${z.tag}</div>
+                          <h3>${z.name}</h3>
+                          <p>${z.description}</p>`;
+        container.appendChild(card);
+    });
+}
 
-        document.getElementById('d').innerText = days.toString().padStart(2, '0');
-        document.getElementById('h').innerText = hours.toString().padStart(2, '0');
-        document.getElementById('m').innerText = mins.toString().padStart(2, '0');
-        document.getElementById('s').innerText = secs.toString().padStart(2, '0');
-    }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    // --- DIVERS ONLINE (using Vercel API) ---
-    const pCountEl = document.getElementById('p-count');
-
-    async function updatePlayerCount() {
-        try {
-            const res = await fetch("https://roblox-player-api-blond.vercel.app/api/players");
-            const data = await res.json();
-            const players = data?.players ?? 0;
-            pCountEl.innerText = players.toLocaleString(); // format numbers
-        } catch (err) {
-            pCountEl.innerText = '0';
-            console.warn('Could not fetch player count:', err);
-        }
-    }
-
-    updatePlayerCount();
-    setInterval(updatePlayerCount, 10000);
-
-    // --- VERSION DISPLAY ---
-    const versionEl = document.createElement('div');
-    versionEl.style.position = 'fixed';
-    versionEl.style.top = '10px';
-    versionEl.style.right = '10px';
-    versionEl.style.fontFamily = 'Orbitron';
-    versionEl.style.color = 'var(--sea-cyan)';
-    versionEl.style.fontSize = '0.8rem';
-    versionEl.innerText = 'v0.4';
-    document.body.appendChild(versionEl);
-    </script>
+// ===================== INITIAL LOAD =====================
+showHome();
+</script>
 </body>
-
 </html>

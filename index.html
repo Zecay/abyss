@@ -341,24 +341,21 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // --- DIVERS ONLINE ---
-    const universeId = '7671049560'; // Roblox Universe ID
+    // --- DIVERS ONLINE (using Vercel API) ---
     const pCountEl = document.getElementById('p-count');
 
     async function updatePlayerCount() {
         try {
-            const res = await fetch(`https://games.roblox.com/v1/games?universeIds=${universeId}`);
-            if (!res.ok) throw new Error('HTTP error ' + res.status);
+            const res = await fetch("https://roblox-player-api-blond.vercel.app/api/players");
             const data = await res.json();
-            const players = data?.data?.[0]?.playing ?? 0;
-            pCountEl.innerText = players.toLocaleString(); // nice formatting
+            const players = data?.players ?? 0;
+            pCountEl.innerText = players.toLocaleString(); // format numbers
         } catch (err) {
             pCountEl.innerText = '0';
-            console.warn('Could not fetch player count:', err.message);
+            console.warn('Could not fetch player count:', err);
         }
     }
 
-    // Initial call and auto-refresh every 10 seconds
     updatePlayerCount();
     setInterval(updatePlayerCount, 10000);
 
@@ -376,6 +373,7 @@
 </body>
 
 </html>
+
 
 
 

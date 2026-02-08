@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sea-cyan: #00ffff;
+            --deep-blue: #001a33;
+            --abyss-black: #010409;
+            --hazard-red: #ff4444;
+            --biolume: rgba(0, 255, 255, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--abyss-black);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* Dynamic Background */
+        #bg-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, var(--deep-blue) 0%, var(--abyss-black) 100%);
+            opacity: 1;
+        }
+
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+
+        /* Depth Meter */
+        #depth-meter {
+            position: fixed;
+            right: 20px; top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            font-family: 'Orbitron';
+            text-align: right;
+            border-right: 2px solid var(--sea-cyan);
+            padding-right: 15px;
+        }
+
+        #depth-value { font-size: 1.2rem; color: var(--sea-cyan); text-shadow: 0 0 10px var(--sea-cyan); }
+
+        /* Scroll Animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
+        }
+
+        .status-pill {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--sea-cyan);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            color: var(--sea-cyan);
+            margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .pulse { width: 8px; height: 8px; background: var(--sea-cyan); border-radius: 50%; animation: pulse-anim 2s infinite; }
+
+        @keyframes pulse-anim { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.5); } }
+
+        .glitch-title {
+            font-family: 'Orbitron';
+            font-size: clamp(3rem, 15vw, 8rem);
+            font-weight: 900;
+            letter-spacing: 20px;
+            margin: 0;
+            text-shadow: 0 0 30px var(--biolume);
+        }
+
+        /* Countdown Cards */
+        .timer-wrap { display: flex; gap: 15px; margin: 40px 0; }
+        .timer-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(0,255,255,0.2);
+            padding: 15px; width: 85px; border-radius: 4px;
+        }
+        .timer-card span { display: block; text-align: center; }
+        .t-num { font-family: 'Orbitron'; font-size: 1.8rem; color: var(--sea-cyan); }
+        .t-lab { font-size: 0.6rem; color: var(--text-gray); text-transform: uppercase; }
+
+        /* Description */
+        .about { max-width: 700px; margin: 100px auto; text-align: center; padding: 0 20px; }
+        .about h2 { font-family: 'Orbitron'; color: var(--sea-cyan); margin-bottom: 20px; }
+        .cinematic-text { font-size: 1.2rem; line-height: 1.8; color: #cbd5e1; font-weight: 300; }
+
+        /* Feature Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; max-width: 1200px; margin: 50px auto; padding: 20px;
+        }
+        .f-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            padding: 40px; border-radius: 12px;
+            transition: 0.4s; position: relative; overflow: hidden;
+        }
+        .f-card:hover { border-color: var(--sea-cyan); transform: translateY(-10px); background: rgba(0, 255, 255, 0.03); }
+        .f-card h3 { font-family: 'Orbitron'; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 2px; }
+        .f-card p { font-size: 0.85rem; color: #94a3b8; line-height: 1.6; }
+
+        /* Sonar Terminal */
+        .terminal {
+            max-width: 600px; margin: 100px auto;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #1a1a1a;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 20px; border-radius: 8px;
+            position: relative;
+        }
+        .terminal::before { content: "SONAR FEED // CLASSIFIED"; display: block; font-size: 0.6rem; color: #444; margin-bottom: 15px; }
+        .log-line { color: var(--sea-cyan); font-size: 0.9rem; margin-bottom: 5px; opacity: 0.8; }
+        .scanline { width: 100%; height: 2px; background: rgba(0,255,255,0.1); position: absolute; top:0; animation: scan 4s linear infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* CTA */
+        .cta-section { padding: 100px 20px; text-align: center; }
+        .btn-group { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+        .btn {
+            text-decoration: none; padding: 20px 40px;
+            font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold;
+            border-radius: 4px; transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-main { background: var(--sea-cyan); color: #000; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
+        .btn-main:hover { box-shadow: 0 0 40px var(--sea-cyan); transform: scale(1.05); }
+        .btn-alt { border: 1px solid var(--sea-cyan); color: var(--sea-cyan); }
+
+        @media (max-width: 600px) {
+            .glitch-title { letter-spacing: 10px; font-size: 3rem; }
+            .timer-card { width: 70px; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="bg-overlay"></div>
+<canvas id="particles"></canvas>
+
+<div id="depth-meter">
+    <div id="depth-value">0000m</div>
+    <div style="font-size: 0.5rem; color: #444; margin-top: 5px;">ABYSSAL POSITION</div>
+</div>
+
+<section class="hero">
+    <div class="status-pill">
+        <div class="pulse"></div>
+        <span>DIVERS ONLINE: 0</span>
+    </div>
+    <h1 class="glitch-title" id="main-title">ABYSS</h1>
+    <p id="sub-title" style="letter-spacing: 8px; color: var(--sea-cyan); font-size: 0.7rem;">EST. FEBRUARY 8, 2026</p>
+
+    <div class="timer-wrap" id="timer">
+        <div class="timer-card"><span class="t-num" id="days">00</span><span class="t-lab">Days</span></div>
+        <div class="timer-card"><span class="t-num" id="hours">00</span><span class="t-lab">Hrs</span></div>
+        <div class="timer-card"><span class="t-num" id="mins">00</span><span class="t-lab">Min</span></div>
+        <div class="timer-card"><span class="t-num" id="secs">00</span><span class="t-lab">Sec</span></div>
+    </div>
+
+    <div class="btn-group">
+        <a href="https://discord.gg/deepspirit" target="_blank" class="btn btn-main" id="primary-cta">Discord Server</a>
+        <a href="https://www.roblox.com/communities/34898222" target="_blank" class="btn btn-alt">Roblox Group</a>
+    </div>
+</section>
+
+<section class="about reveal">
+    <h2>THE LAST FRONTIER</h2>
+    <p class="cinematic-text">
+        Descend into a living ocean. Hunt, survive, and uncover what lurks in the deep. 
+        Every dive is a new challenge. Every creature is a story waiting to be told.
+    </p>
+</section>
+
+<section class="grid">
+    <div class="f-card reveal">
+        <h3>DEEP-SEA EXPLORATION</h3>
+        <p>Explore unknown depths where light never reaches. Discover hidden ruins and bioluminescent forests.</p>
+    </div>
+    <div class="f-card reveal">
+        <h3>CREATURE HUNTING</h3>
+        <p>Over 500 unique species. Use harpoons and sonar tech to hunt the predators of the void.</p>
+    </div>
+    <div class="f-card reveal">
+        <h3>RPG PROGRESSION</h3>
+        <p>Unlock racial perks and upgrade your oxygen capacity to survive longer in the crushing deep.</p>
+    </div>
+</section>
+
+<section class="terminal reveal">
+    <div class="scanline"></div>
+    <div id="log-container">
+        <div class="log-line">> INITIALIZING SONAR...</div>
+        <div class="log-line">> SCANNING DEPTH: 2,400M</div>
+    </div>
+</section>
+
+<section class="cta-section reveal">
+    <h2 style="font-family: 'Orbitron'; margin-bottom: 10px;">READY TO DIVE?</h2>
+    <p style="color: var(--text-gray); font-size: 0.9rem;">Be among the first divers to enter the Abyss.</p>
+    <div class="btn-group">
+        <a href="#" class="btn btn-main">Play on Roblox</a>
+        <a href="https://discord.gg/deepspirit" class="btn btn-alt">Join Community</a>
+    </div>
+</section>
+
+<script>
+    // 1. Particle Ambiance
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function init() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        particles = Array.from({length: 60}, () => ({
+            x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+            s: Math.random()*2, v: Math.random()*0.5 + 0.1
+        }));
+    }
+    function draw() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0, 255, 255, 0.2)";
+        particles.forEach(p => {
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
+            p.y -= p.v; if(p.y < 0) p.y = canvas.height;
+        });
+        requestAnimationFrame(draw);
+    }
+
+    // 2. Scroll Logic (Depth & Reveal)
+    window.addEventListener('scroll', () => {
+        const scrolled = window.scrollY;
+        // Update Depth
+        document.getElementById('depth-value').innerText = `${Math.floor(scrolled * 4).toString().padStart(4, '0')}m`;
+        // Darken Background
+        const opacity = Math.max(0.2, 1 - scrolled / 2000);
+        document.getElementById('bg-overlay').style.opacity = opacity;
+        
+        // Trigger Reveal
+        document.querySelectorAll('.reveal').forEach(el => {
+            if(el.getBoundingClientRect().top < window.innerHeight * 0.8) el.classList.add('active');
+        });
+    });
+
+    // 3. Terminal Logs
+    const logs = [
+        "> DEPTH: 3200m – UNKNOWN ENTITY DETECTED",
+        "> CREATURE LOG #042 – STATUS: HOSTILE",
+        "> SIGNAL LOST...",
+        "> RE-ESTABLISHING UPLINK...",
+        "> BIOMASS DETECTED: LARGE",
+        "> PRESSURE LEVEL: CRITICAL",
+        "> OXYGEN LEVEL: 84%"
+    ];
+    let logIdx = 0;
+    setInterval(() => {
+        const container = document.getElementById('log-container');
+        const line = document.createElement('div');
+        line.className = 'log-line';
+        line.innerText = logs[logIdx];
+        container.appendChild(line);
+        if(container.children.length > 5) container.removeChild(container.firstChild);
+        logIdx = (logIdx + 1) % logs.length;
+    }, 3000);
+
+    // 4. Countdown Logic
+    const launchDate = new Date('2026-02-08T21:00:00').getTime();
+    function updateTimer() {
+        const now = new Date().getTime();
+        const diff = launchDate - now;
+
+        if (diff <= 0) {
+            document.getElementById('main-title').innerText = "OPENED";
+            document.getElementById('sub-title').innerText = "THE ABYSS IS READY FOR YOU";
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('primary-cta').innerText = "PLAY ON ROBLOX";
+            return;
+        }
+
+        const d = Math.floor(diff / (86400000));
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+
+        document.getElementById('days').innerText = d.toString().padStart(2, '0');
+        document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+        document.getElementById('mins').innerText = m.toString().padStart(2, '0');
+        document.getElementById('secs').innerText = s.toString().padStart(2, '0');
+    }
+
+    window.addEventListener('resize', init);
+    init(); draw();
+    setInterval(updateTimer, 1000); updateTimer();
+</script>
+</body>
+</html>

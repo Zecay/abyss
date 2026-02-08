@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Abyss Wiki</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== VARIABLES ===================== */
+:root {
+    --sea-cyan: #00ffff;
+    --bg-dark: #010409;
+    --text-gray: #94a3b8;
+    --biolume: rgba(0, 255, 255, 0.4);
+}
+
+/* ===================== GLOBAL ===================== */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: white;
+}
+a { text-decoration: none; color: var(--sea-cyan); }
+h1,h2,h3,h4,h5,h6 { font-family: 'Orbitron', sans-serif; }
+
+/* ===================== HEADER ===================== */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.8);
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0,255,255,0.1);
+}
+header h1 { font-size: 1.8rem; letter-spacing: 3px; }
+nav a {
+    margin-left: 25px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: 0.3s;
+}
+nav a:hover { color: #00ffff; }
+
+/* ===================== MAIN CONTENT ===================== */
+main {
+    padding: 120px 40px 60px; /* leave space for header */
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* ===================== GRID CARDS ===================== */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+.card {
+    background: rgba(0,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    transition: 0.3s;
+}
+.card:hover { border-color: var(--sea-cyan); }
+.card h3 { margin-bottom: 12px; color: var(--sea-cyan); }
+.card p { color: var(--text-gray); line-height: 1.6; }
+
+/* ===================== TAGS ===================== */
+.tag {
+    display: inline-block;
+    background: rgba(0,255,255,0.1);
+    color: var(--sea-cyan);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-bottom: 8px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 600px) {
+    header { flex-direction: column; align-items: flex-start; }
+    nav { margin-top: 10px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>ABYSS WIKI</h1>
+    <nav>
+        <a href="#" onclick="showSection('classes')">Classes</a>
+        <a href="#" onclick="showSection('creatures')">Creatures</a>
+        <a href="#" onclick="showSection('gear')">Gear</a>
+        <a href="#" onclick="showSection('zones')">Zones</a>
+    </nav>
+</header>
+
+<main id="content">
+    <section id="intro">
+        <h2>Welcome to Abyss</h2>
+        <p>Explore the deep, hunt creatures, survive the crushing pressure, and discover secrets of the ocean. Use the menu above to navigate through races, creatures, gear, and zones.</p>
+    </section>
+
+    <section id="classes" style="display:none;">
+        <h2>Playable Classes</h2>
+        <div class="grid" id="class-grid">
+            <!-- Cards will be added dynamically -->
+        </div>
+    </section>
+
+    <section id="creatures" style="display:none;">
+        <h2>Creatures & Fish</h2>
+        <div class="grid" id="creature-grid"></div>
+    </section>
+
+    <section id="gear" style="display:none;">
+        <h2>Gear & Items</h2>
+        <div class="grid" id="gear-grid"></div>
+    </section>
+
+    <section id="zones" style="display:none;">
+        <h2>Zones & Maps</h2>
+        <div class="grid" id="zone-grid"></div>
+    </section>
+</main>
+
+<script>
+// ===================== NAVIGATION =====================
+function showSection(sectionId) {
+    document.querySelectorAll('main > section').forEach(sec => sec.style.display = 'none');
+    document.getElementById(sectionId).style.display = 'block';
+}
+
+// ===================== SAMPLE DATA =====================
+const classes = [
+    { name: "Deep Diver", tag: "Survivalist", description: "Specializes in deep diving and oxygen management." },
+    { name: "Abyssal Child", tag: "Explorer", description: "Fast swimmer, excels in exploration and stealth." }
+];
+
+function populateClasses() {
+    const container = document.getElementById('class-grid');
+    container.innerHTML = '';
+    classes.forEach(cls => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `<div class="tag">${cls.tag}</div>
+                          <h3>${cls.name}</h3>
+                          <p>${cls.description}</p>`;
+        container.appendChild(card);
+    });
+}
+
+populateClasses();
+</script>
+
+</body>
+</html>

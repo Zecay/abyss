@@ -306,27 +306,33 @@
         });
 
         // RELEASE TIME: Feb 8, 2026 at 9:00 PM (21:00)
-        const target = new Date('2026-02-08T21:00:00').getTime();
-        
+        // TARGET DATE: Feb 8, 2026 at 21:00 GMT+3
+        // Convert to UTC: 21:00 GMT+3 = 18:00 UTC
+        const target = new Date('2026-02-08T18:00:00Z').getTime();
+    
         function updateTime() {
             const now = new Date().getTime();
             const diff = target - now;
-            
-            if(diff < 0) {
-                document.getElementById('timer').innerHTML = "<h2 style='color:var(--sea-cyan); font-family:Orbitron;'>THE ABYSS HAS OPENED</h2>";
+    
+            if (diff < 0) {
+                document.getElementById('timer').innerHTML =
+                    "<h2 style='color:var(--sea-cyan); font-family:Orbitron;'>THE ABYSS HAS OPENED</h2>";
                 return;
             }
-            
+    
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
+    
             document.getElementById('d').innerText = days.toString().padStart(2, '0');
             document.getElementById('h').innerText = hours.toString().padStart(2, '0');
             document.getElementById('m').innerText = mins.toString().padStart(2, '0');
             document.getElementById('s').innerText = secs.toString().padStart(2, '0');
         }
+    
+        setInterval(updateTime, 1000);
+        updateTime();
 
         window.addEventListener('resize', init);
         init(); animate();
@@ -334,4 +340,5 @@
         updateTime();
     </script>
 </body>
+
 </html>

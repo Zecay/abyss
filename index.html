@@ -9,6 +9,8 @@
     --bg-dark: #010409;
     --biolume: rgba(0, 255, 255, 0.4);
     --text-gray: #94a3b8;
+    --accent-purple: #7c3aed;
+    --accent-blue: #0ea5e9;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -158,24 +160,214 @@ header nav a:hover {
 .content-box { max-width: 900px; text-align: center; }
 .content-box h2 { font-family: 'Orbitron'; color: var(--sea-cyan); font-size: 2.2rem; margin-bottom: 25px; }
 .content-box p { font-size: 1.1rem; line-height: 1.8; color: var(--text-gray); margin-bottom: 40px; }
-.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; margin-top: 40px; }
+
+/* IMPROVED FEATURE GRID - Main Features Section */
+.features-section {
+    width: 100%;
+    padding: 80px 20px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 255, 255, 0.03));
+}
+
+.features-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.features-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.features-header h2 {
+    font-family: 'Orbitron';
+    font-size: 2.5rem;
+    color: var(--sea-cyan);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.features-header p {
+    color: var(--text-gray);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    width: 100%;
+}
+
 .feature-item {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    text-align: center;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Glowing border effect on hover */
+.feature-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.feature-item:hover {
+    border-color: var(--sea-cyan);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 255, 255, 0.15), inset 0 0 20px rgba(0, 255, 255, 0.05);
+}
+
+.feature-item:hover::before {
+    opacity: 1;
+}
+
+.feature-item h4 {
+    font-family: 'Orbitron';
+    color: var(--sea-cyan);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover h4 {
+    text-shadow: 0 0 15px var(--sea-cyan);
+    font-size: 1.4rem;
+}
+
+.feature-item p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin: 0;
+    color: var(--text-gray);
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover p {
+    color: #fff;
+}
+
+/* Icon placeholder style */
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: rgba(0, 255, 255, 0.1);
+    border: 2px solid var(--sea-cyan);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover .feature-icon {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Wiki grid (for Wiki section) */
+.wiki-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.wiki-feature-item {
     background: rgba(255, 255, 255, 0.02);
-    padding: 30px;
-    border-radius: 15px;
+    padding: 25px;
+    border-radius: 12px;
     border: 1px solid rgba(0, 255, 255, 0.1);
-    text-align: left;
+    text-align: center;
     transition: 0.3s;
 }
-.feature-item:hover { border-color: var(--sea-cyan); }
-.feature-item h4 { font-family: 'Orbitron'; color: var(--sea-cyan); margin-bottom: 12px; text-transform: uppercase; }
-.feature-item p { font-size: 0.9rem; line-height: 1.6; margin: 0; }
-.tag { display: inline-block; background: rgba(0, 255, 255, 0.1); color: var(--sea-cyan); padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-family: 'Orbitron'; margin-bottom: 15px; }
+
+.wiki-feature-item:hover {
+    border-color: var(--sea-cyan);
+    transform: translateY(-5px);
+}
+
+.wiki-feature-item h4 {
+    font-family: 'Orbitron';
+    color: var(--sea-cyan);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.wiki-feature-item p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--text-gray);
+}
+
+.tag {
+    display: inline-block;
+    background: rgba(0, 255, 255, 0.1);
+    color: var(--sea-cyan);
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-family: 'Orbitron';
+    margin-bottom: 20px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .features-header h2 {
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+    }
+    
+    .feature-item {
+        min-height: auto;
+        padding: 30px;
+    }
+}
 
 @media (max-width: 600px) {
     .title { letter-spacing: 5px; font-size: 2.5rem; }
     .card { min-width: 70px; padding: 10px; }
     .num { font-size: 1.5rem; }
+    
+    .features-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .feature-item h4 {
+        font-size: 1.1rem;
+    }
 }
 </style>
 </head>
@@ -221,24 +413,40 @@ header nav a:hover {
     </div>
 </section>
 
-<div class="feature-item">
-  <h4>Deep Sea Fishing</h4>
-  <p>Use harpoon‑style guns to catch over 500 unique fish and mutations as you explore underwater. Complete a mini‑game to hook rare catches! :contentReference[oaicite:1]{index=1}</p>
-</div>
+<!-- Features Section -->
+<div class="features-section">
+    <div class="features-container">
+        <div class="features-header">
+            <h2>Game Features</h2>
+            <p>Dive deep into the abyss and discover what awaits below</p>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🎣</div>
+                <h4>Deep Sea Fishing</h4>
+                <p>Use harpoon-style guns to catch over 500 unique fish and mutations as you explore underwater. Complete a mini-game to hook rare catches!</p>
+            </div>
 
-<div class="feature-item">
-  <h4>Races & Passive Skills</h4>
-  <p>Roll for Races that give unique passive boosts like oxygen regen, damage, speed, and special abilities to help you dive deeper. :contentReference[oaicite:2]{index=2}</p>
-</div>
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <h4>Races & Passive Skills</h4>
+                <p>Roll for Races that give unique passive boosts like oxygen regen, damage, speed, and special abilities to help you dive deeper.</p>
+            </div>
 
-<div class="feature-item">
-  <h4>Tubes & Gear Progression</h4>
-  <p>Upgrade your tubes and gear to increase oxygen capacity, carry weight, and unlock deeper biomes full of rarer fish and treasures. :contentReference[oaicite:3]{index=3}</p>
-</div>
+            <div class="feature-item">
+                <div class="feature-icon">⚙️</div>
+                <h4>Tubes & Gear Progression</h4>
+                <p>Upgrade your tubes and gear to increase oxygen capacity, carry weight, and unlock deeper biomes full of rarer fish and treasures.</p>
+            </div>
 
-<div class="feature-item">
-  <h4>Exploration & Biomes</h4>
-  <p>Explore diverse biomes beneath the surface with distinct fish, artifacts, and secrets — the deeper you go, the richer the rewards (and risks). :contentReference[oaicite:4]{index=4}</p>
+            <div class="feature-item">
+                <div class="feature-icon">🌊</div>
+                <h4>Exploration & Biomes</h4>
+                <p>Explore diverse biomes beneath the surface with distinct fish, artifacts, and secrets — the deeper you go, the richer the rewards (and risks).</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Wiki Section -->
@@ -248,11 +456,11 @@ header nav a:hover {
         <h2>WIKI OVERVIEW</h2>
         <p>Explore the world of Abyss! Click on categories below to view details about Classes, Creatures, Gear, and Zones.</p>
 
-        <div class="feature-grid">
-            <div class="feature-item"><h4>Classes</h4><p>View all diver classes and their subclasses.</p></div>
-            <div class="feature-item"><h4>Creatures</h4><p>All creatures and monsters you can encounter.</p></div>
-            <div class="feature-item"><h4>Gear</h4><p>All equipment and upgrades in the game.</p></div>
-            <div class="feature-item"><h4>Zones</h4><p>All locations and biomes in the Abyss.</p></div>
+        <div class="wiki-feature-grid">
+            <div class="wiki-feature-item"><h4>Classes</h4><p>View all diver classes and their subclasses.</p></div>
+            <div class="wiki-feature-item"><h4>Creatures</h4><p>All creatures and monsters you can encounter.</p></div>
+            <div class="wiki-feature-item"><h4>Gear</h4><p>All equipment and upgrades in the game.</p></div>
+            <div class="wiki-feature-item"><h4>Zones</h4><p>All locations and biomes in the Abyss.</p></div>
         </div>
     </div>
 </section>

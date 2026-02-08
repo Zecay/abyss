@@ -270,100 +270,113 @@
         </div>
     </section>
 
-    <script>
-        // Particles
-        const canvas = document.getElementById('canvas-particles');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        function init() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<80; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speed: Math.random() * 0.4 + 0.1
-                });
-            }
-        }
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(0, 255, 255, 0.3)";
-            particles.forEach(p => {
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-                p.y -= p.speed; if(p.y < 0) p.y = canvas.height;
+<script>
+    // --- PARTICLES ---
+    const canvas = document.getElementById('canvas-particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function initParticles() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        particles = [];
+        for (let i = 0; i < 80; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 0.4 + 0.1
             });
-            requestAnimationFrame(animate);
         }
+    }
 
-        // Depth Scroll Logic
-        window.addEventListener('scroll', () => {
-            const depth = Math.floor(window.scrollY * 2.5);
-            document.getElementById('depth-value').innerText = `${depth}m`;
-            const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-            document.getElementById('pointer').style.top = `${scrollPercent}%`;
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0, 255, 255, 0.3)";
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            p.y -= p.speed;
+            if (p.y < 0) p.y = canvas.height;
         });
+        requestAnimationFrame(animateParticles);
+    }
 
-        // RELEASE TIME: Feb 8, 2026 at 9:00 PM (21:00)
-        // TARGET DATE: Feb 8, 2026 at 21:00 GMT+3
-        // Convert to UTC: 21:00 GMT+3 = 18:00 UTC
-        const target = new Date('2026-02-08T18:00:00Z').getTime();
-    
-        function updateTime() {
-            const now = new Date().getTime();
-            const diff = target - now;
-    
-            if (diff < 0) {
-                document.getElementById('timer').innerHTML =
-                    "<h2 style='color:var(--sea-cyan); font-family:Orbitron;'>THE ABYSS HAS OPENED</h2>";
-                return;
-            }
-    
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-    
-            document.getElementById('d').innerText = days.toString().padStart(2, '0');
-            document.getElementById('h').innerText = hours.toString().padStart(2, '0');
-            document.getElementById('m').innerText = mins.toString().padStart(2, '0');
-            document.getElementById('s').innerText = secs.toString().padStart(2, '0');
+    window.addEventListener('resize', initParticles);
+    initParticles();
+    animateParticles();
+
+    // --- DEPTH METER ---
+    window.addEventListener('scroll', () => {
+        const depth = Math.floor(window.scrollY * 2.5);
+        document.getElementById('depth-value').innerText = `${depth}m`;
+        const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        document.getElementById('pointer').style.top = `${scrollPercent}%`;
+    });
+
+    // --- COUNTDOWN ---
+    const releaseTarget = new Date('2026-02-08T18:00:00Z').getTime(); // UTC
+    function updateCountdown() {
+        const now = Date.now();
+        const diff = releaseTarget - now;
+
+        if (diff <= 0) {
+            document.getElementById('timer').innerHTML =
+                "<h2 style='color:var(--sea-cyan); font-family:Orbitron;'>THE ABYSS HAS OPENED</h2>";
+            return;
         }
-    
-        setInterval(updateTime, 1000);
-        updateTime();
 
-        window.addEventListener('resize', init);
-        init(); animate();
-        setInterval(updateTime, 1000);
-        updateTime();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-    const universeId = '7671049560'; // Replace with a public game ID for testing
+        document.getElementById('d').innerText = days.toString().padStart(2, '0');
+        document.getElementById('h').innerText = hours.toString().padStart(2, '0');
+        document.getElementById('m').innerText = mins.toString().padStart(2, '0');
+        document.getElementById('s').innerText = secs.toString().padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // --- DIVERS ONLINE ---
+    const universeId = '7671049560'; // Public game ID for testing
     const pCountEl = document.getElementById('p-count');
 
     async function updatePlayerCount() {
         try {
             const res = await fetch(`https://games.roblox.com/v1/games?universeIds=${universeId}`);
+            if (!res.ok) throw new Error('HTTP error ' + res.status);
             const data = await res.json();
-            if (data.data && data.data[0]) {
-                const players = data.data[0].playing || 0;
-                pCountEl.innerText = players;
-            }
+            const players = data?.data?.[0]?.playing ?? 0;
+            pCountEl.innerText = players;
         } catch (err) {
-            console.error('Failed to fetch player count:', err);
+            // Do not throw an error; fallback to 0
             pCountEl.innerText = '0';
+            console.warn('Could not fetch player count:', err.message);
         }
     }
 
-    // Update every 10 seconds
     updatePlayerCount();
     setInterval(updatePlayerCount, 10000);
-    console.log('website version: v0.2')
+
+    // --- VERSION DISPLAY ---
+    const versionEl = document.createElement('div');
+    versionEl.style.position = 'fixed';
+    versionEl.style.top = '10px';
+    versionEl.style.right = '10px';
+    versionEl.style.fontFamily = 'Orbitron';
+    versionEl.style.color = 'var(--sea-cyan)';
+    versionEl.style.fontSize = '0.8rem';
+    versionEl.innerText = 'v0.2';
+    document.body.appendChild(versionEl);
     </script>
 </body>
 
 </html>
+
 
 
 

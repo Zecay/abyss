@@ -342,7 +342,7 @@
     updateCountdown();
 
     // --- DIVERS ONLINE ---
-    const universeId = '7671049560'; // Public game ID for testing
+    const universeId = '7671049560'; // Roblox Universe ID
     const pCountEl = document.getElementById('p-count');
 
     async function updatePlayerCount() {
@@ -351,14 +351,14 @@
             if (!res.ok) throw new Error('HTTP error ' + res.status);
             const data = await res.json();
             const players = data?.data?.[0]?.playing ?? 0;
-            pCountEl.innerText = players;
+            pCountEl.innerText = players.toLocaleString(); // nice formatting
         } catch (err) {
-            // Do not throw an error; fallback to 0
             pCountEl.innerText = '0';
             console.warn('Could not fetch player count:', err.message);
         }
     }
 
+    // Initial call and auto-refresh every 10 seconds
     updatePlayerCount();
     setInterval(updatePlayerCount, 10000);
 
@@ -370,12 +370,13 @@
     versionEl.style.fontFamily = 'Orbitron';
     versionEl.style.color = 'var(--sea-cyan)';
     versionEl.style.fontSize = '0.8rem';
-    versionEl.innerText = 'v0.2';
+    versionEl.innerText = 'v0.3';
     document.body.appendChild(versionEl);
     </script>
 </body>
 
 </html>
+
 
 
 
